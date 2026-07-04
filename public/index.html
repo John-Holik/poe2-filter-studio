@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>POE2 Filter Studio</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M1.5 2h13L10 8.4v5.1l-4 2V8.4L1.5 2z' fill='%236366f1'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header id="topbar">
+  <div class="brand" title="Edits .filter files in your Path of Exile 2 folder (Documents\My Games\Path of Exile 2 by default — see server.js)">
+    <svg class="brand-mark" width="15" height="15" viewBox="0 0 16 16" aria-hidden="true">
+      <path d="M1.5 2h13L10 8.4v5.1l-4 2V8.4L1.5 2z" fill="#6366f1"/>
+    </svg>
+    <span>POE2 Filter Studio</span>
+  </div>
+  <span class="tb-group">
+    <select id="filter-select" title="Filters in the PoE2 folder"></select>
+    <button id="btn-load" title="Load selected filter">Load</button>
+    <button id="btn-new" title="New filter">New</button>
+  </span>
+  <span class="tb-file" id="tb-file"></span>
+  <span class="spacer"></span>
+  <span id="name-prompt" hidden>
+    <input id="name-input" placeholder="MyFilter.filter" spellcheck="false">
+    <button id="name-ok" class="primary">Save as</button>
+  </span>
+  <span class="tb-group">
+    <button id="btn-save" class="primary" title="Save (Ctrl+S)">Save<span id="dirty-dot" class="dot" hidden></span></button>
+    <button id="btn-saveas" title="Save under a new name">Save as&hellip;</button>
+    <button id="btn-export" title="Download the serialized .filter">Export</button>
+  </span>
+  <button id="btn-warn" class="warn-btn" title="Warnings"><span class="warn-ico">&#9888;</span><span id="warn-count">0</span></button>
+</header>
+
+<div id="warn-drawer" hidden></div>
+
+<main>
+  <aside id="catalog-pane">
+    <div class="pane-head">
+      <div class="search-wrap">
+        <svg class="search-ico" width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+          <circle cx="7" cy="7" r="4.6" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10.4 10.4 14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <input id="catalog-search" type="search" placeholder="Search items&hellip;" spellcheck="false">
+      </div>
+    </div>
+    <div id="catalog-list"></div>
+    <div id="catalog-footer">
+      <div class="cat-foot-row">
+        <span id="catalog-count">0 selected</span>
+        <button id="btn-clear-sel" class="ghost">Clear</button>
+      </div>
+      <button id="btn-add-rules" class="primary">+ Add rule(s) for selection</button>
+    </div>
+  </aside>
+
+  <section id="rules-pane">
+    <div id="rules-list"></div>
+  </section>
+
+  <aside id="style-pane">
+    <div class="pane-head scope" id="style-scope">New-rule style</div>
+    <div id="style-preview">
+      <span id="pv-beam" class="pv-beam" hidden></span>
+      <span id="pv-icon" class="pv-icon" hidden></span>
+      <span id="preview-chip">Divine Orb</span>
+      <span id="pv-shape" class="pv-shape" hidden></span>
+      <span id="pv-sound" class="pv-sound" hidden></span>
+    </div>
+
+    <section class="ctl-section">
+      <div class="ctl-section-title">Appearance</div>
+
+      <div class="ctl-group">
+        <div class="ctl-row">
+          <span class="ctl-title">Action</span>
+          <div class="seg" id="seg-action">
+            <button type="button" data-v="Show">Show</button>
+            <button type="button" data-v="Hide">Hide</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="ctl-group">
+        <label class="ctl-check"><input type="checkbox" id="fs-on"><span>Font size</span></label>
+        <div class="ctl-row indent" id="fs-row">
+          <input type="range" id="fs-range" min="1" max="45" value="38">
+          <input type="number" id="fs-num" min="1" max="45" value="38">
+        </div>
+      </div>
+
+      <div class="ctl-group">
+        <label class="ctl-check"><input type="checkbox" id="tc-on"><span>Text color</span></label>
+        <div class="ctl-row indent" id="tc-row">
+          <input type="color" id="tc-color" value="#ffffff">
+          <input type="range" id="tc-alpha" min="0" max="255" value="255" title="Alpha 0-255">
+          <span class="readout" id="tc-read"></span>
+        </div>
+      </div>
+
+      <div class="ctl-group">
+        <label class="ctl-check"><input type="checkbox" id="bc-on"><span>Border color</span></label>
+        <div class="ctl-row indent" id="bc-row">
+          <input type="color" id="bc-color" value="#ffffff">
+          <input type="range" id="bc-alpha" min="0" max="255" value="255" title="Alpha 0-255">
+          <span class="readout" id="bc-read"></span>
+        </div>
+      </div>
+
+      <div class="ctl-group">
+        <label class="ctl-check"><input type="checkbox" id="bg-on"><span>Background color</span></label>
+        <div class="ctl-row indent" id="bg-row">
+          <input type="color" id="bg-color" value="#000000">
+          <input type="range" id="bg-alpha" min="0" max="255" value="255" title="Alpha 0-255">
+          <span class="readout" id="bg-read"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="ctl-section">
+      <div class="ctl-section-title">Map &amp; world</div>
+
+      <div class="ctl-group">
+        <label class="ctl-check"><input type="checkbox" id="mi-on"><span>Minimap icon</span></label>
+        <div class="ctl-row indent" id="mi-row">
+          <div class="seg" id="seg-mi-size">
+            <button type="button" data-v="0" title="Size 0 (large)">L</button>
+            <button type="button" data-v="1" title="Size 1 (medium)">M</button>
+            <button type="button" data-v="2" title="Size 2 (small)">S</button>
+          </div>
+          <select id="mi-color" title="Icon color"></select>
+          <select id="mi-shape" title="Icon shape"></select>
+          <span class="glyph-swatch" id="mi-swatch">&#9679;</span>
+        </div>
+      </div>
+
+      <div class="ctl-group">
+        <label class="ctl-check"><input type="checkbox" id="pe-on"><span>Beam (PlayEffect)</span></label>
+        <div class="ctl-row indent" id="pe-row">
+          <select id="pe-color" title="Beam color"></select>
+          <label class="mini-check"><input type="checkbox" id="pe-temp"><span>Temporary</span></label>
+          <span class="glyph-swatch" id="pe-swatch">&#9646;</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="ctl-section">
+      <div class="ctl-section-title">Sound</div>
+
+      <div class="ctl-group">
+        <label class="ctl-check"><input type="checkbox" id="as-on"><span>Alert sound</span></label>
+        <div class="ctl-row indent" id="as-row">
+          <select id="as-id" title="Sound id"></select>
+          <input type="range" id="as-vol" min="0" max="300" value="300" title="Volume 0-300">
+          <span class="readout" id="as-vol-read">300</span>
+          <button type="button" id="as-play" title="Preview sound">&#9654;</button>
+        </div>
+        <div class="note indent">previews are synthesized approximations, not game audio</div>
+      </div>
+    </section>
+
+    <section class="ctl-section">
+      <div class="ctl-section-title">Presets</div>
+      <div class="preset-row" id="presets"></div>
+    </section>
+  </aside>
+</main>
+
+<div id="toasts"></div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

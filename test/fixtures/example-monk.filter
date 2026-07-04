@@ -1,0 +1,328 @@
+# =====================================================================
+#  John's T1 Endgame Filter  —  Monk (Quarterstaff, Evasion/ES)
+# ---------------------------------------------------------------------
+#  SHOWS:  Currency (value-tiered)  |  Runes & Soul Cores (tiered)  |
+#          Waystones (tiered by WaystoneTier)  |  Omens/Logbooks/Keys  |
+#          ALL uniques  |  Skill + Support gems  |  Rare jewellery &
+#          jewels  |  Magic/Rare flasks & charms  |  Quarterstaves (all
+#          rarities)  |  Evasion/ES armour bases (all rarities).
+#  HIDES:  Invalid armour (any base with the Armour stat), invalid
+#          weapons (non-Quarterstaff), off-hands, quivers, white flasks,
+#          junk jewellery, and any gear below the item-level floor.
+#  QUIET:  Gold is shown but plays NO alert sound (block 0).
+#
+#  TIERS (loudest first):
+#    Currency  S = red star + sound 6  |  High = red + sound 1  |
+#              Mid = orange + sound 2  |  rest = quiet catch-all.
+#    Waystones T15+ loud (red) → T11-14 (orange) → T6-10 (light) →
+#              T1-5 quiet.  Each group ends in a catch-all so NOTHING
+#              in that class is ever silently hidden.
+#
+#  ITEM-LEVEL FLOOR = 65  (T1 area level; you are char level 69).
+#  Gear under ilvl 65 is hidden. Bump this up as you push higher tiers
+#  if you want to thin out lower bases — but never above your current
+#  map's area level or you'll hide that tier's drops.
+#
+#  Built 2026-06-26. Syntax verified against NeverSink's PoE2 filter.
+#  Updated 2026-06-30: added silent Gold block (0), verified gem block.
+#  Updated 2026-07-01: tiered currency, runes/soul cores, waystones;
+#    value groupings + base names lifted from NeverSink's PoE2 filter.
+#  Filters run top-to-bottom; first matching block wins.
+# =====================================================================
+
+
+# ---------------------------------------------------------------------
+# 0) GOLD  — shown but SILENT.  Gold's Class is "Stackable Currency", so
+#    without this block it falls into the currency tiers and plays a
+#    sound.  Placed FIRST (first match wins) so gold shows quietly with
+#    no sound and no ground beam.  Every other currency keeps its sound.
+# ---------------------------------------------------------------------
+Show
+	BaseType == "Gold"
+	SetFontSize 30
+	SetTextColor 200 180 120
+	SetBorderColor 90 80 50
+	SetBackgroundColor 20 20 0
+
+
+# =====================================================================
+# 1) CURRENCY  — value-tiered (Stackable Currency).  Base names taken
+#    from NeverSink's tierlist.  Final catch-all shows anything not
+#    explicitly listed, so no currency is ever hidden.
+# =====================================================================
+Show  # S-tier — jackpot (Divine, Mirror, Perfect/Fracturing orbs, bones)
+	Class == "Stackable Currency"
+	BaseType == "Albino Rhoa Feather" "Altered Collarbone" "Ancient Collarbone" "Ancient Jawbone" "Ancient Rib" "Divine Orb" "Fracturing Orb" "Hinekora's Lock" "Mirror of Kalandra" "Orb of Extraction" "Perfect Chaos Orb" "Perfect Exalted Orb" "Perfect Jeweller's Orb" "Vaal Cultivation Orb"
+	SetFontSize 45
+	SetTextColor 255 0 0 255
+	SetBorderColor 255 0 0 255
+	SetBackgroundColor 255 255 255
+	MinimapIcon 0 Red Star
+	PlayEffect Red
+	PlayAlertSound 6 300
+
+Show  # High — Annul/Chance/Chaos-tier, Vaal infusers, sacrifice orbs
+	Class == "Stackable Currency"
+	BaseType == "Ancient Infuser" "Architect's Orb" "Chaos Orb" "Core Destabiliser" "Crystallised Corruption" "Greater Chaos Orb" "Greater Exalted Orb" "Kamasa's Orb of Sacrifice" "Kopec's Orb of Sacrifice" "Orb of Annulment" "Orb of Chance" "Perfect Orb of Augmentation" "Perfect Orb of Transmutation" "Perfect Regal Orb" "Preserved Collarbone" "Preserved Cranium" "Preserved Rib" "Vaal Armourer's Infuser" "Vaal Blacksmith's Infuser" "Vaal Catalysing Infuser" "Yaomac's Orb of Sacrifice" "Yugul's Orb of Sacrifice"
+	SetFontSize 44
+	SetTextColor 255 255 255 255
+	SetBorderColor 255 255 255 255
+	SetBackgroundColor 240 80 70
+	MinimapIcon 0 Red Circle
+	PlayEffect Red
+	PlayAlertSound 1 300
+
+Show  # Mid — Exalted/Alchemy/Regal/Gemcutter/Glassblower/Vaal Orb
+	Class == "Stackable Currency"
+	BaseType == "Armourer's Scrap" "Artificer's Orb" "Blacksmith's Whetstone" "Chance Shard" "Exalted Orb" "Gemcutter's Prism" "Glassblower's Bauble" "Gnawed Collarbone" "Gnawed Jawbone" "Gnawed Rib" "Greater Jeweller's Orb" "Greater Orb of Augmentation" "Greater Orb of Transmutation" "Greater Regal Orb" "Orb of Alchemy" "Preserved Jawbone" "Regal Orb" "Vaal Arcanist's Infuser" "Vaal Orb" "Vaal Siphoner"
+	SetFontSize 40
+	SetTextColor 25 15 0 255
+	SetBorderColor 200 120 40
+	SetBackgroundColor 245 160 90
+	MinimapIcon 1 Yellow Circle
+	PlayEffect Yellow
+	PlayAlertSound 2 300
+
+Show  # Catch-all — shards, transmute/aug, and anything unlisted (quiet)
+	Class == "Stackable Currency"
+	SetFontSize 36
+	SetTextColor 255 207 80
+	SetBorderColor 255 207 80
+	SetBackgroundColor 35 24 0
+	MinimapIcon 2 Yellow Circle
+
+
+# =====================================================================
+# 2) RUNES & SOUL CORES  (Class "Augment").  Soul Cores + Idols are the
+#    chase socketables (loud); Greater runes are mid; the rest (Lesser /
+#    normal crafting runes) show quiet.  Catch-all = never hidden.
+# =====================================================================
+Show  # Soul Cores & Idols — chase socketables
+	Class == "Augment"
+	BaseType "Soul Core" "Idol"
+	SetFontSize 42
+	SetTextColor 255 255 255 255
+	SetBorderColor 255 100 90
+	SetBackgroundColor 190 40 40
+	MinimapIcon 0 Red Circle
+	PlayEffect Red
+	PlayAlertSound 3 300
+
+Show  # Greater runes — mid
+	Class == "Augment"
+	BaseType "Greater"
+	SetFontSize 38
+	SetTextColor 240 207 132
+	SetBorderColor 240 207 132
+	MinimapIcon 2 White Circle
+	PlayEffect White Temp
+
+Show  # Rest — Lesser / normal crafting runes (quiet catch-all)
+	Class == "Augment"
+	SetFontSize 34
+	SetTextColor 220 175 132
+	SetBorderColor 150 120 90
+
+
+# =====================================================================
+# 3) WAYSTONES  — tiered by WaystoneTier.  Higher tier = louder.  Final
+#    catch-all shows any waystone whose tier falls outside the ranges.
+# =====================================================================
+Show  # T15-16 — top maps (loud)
+	Class == "Waystones"
+	WaystoneTier >= 15
+	SetFontSize 45
+	SetTextColor 255 255 255 255
+	SetBorderColor 255 60 60
+	SetBackgroundColor 60 0 0
+	MinimapIcon 0 Red Diamond
+	PlayEffect Red
+	PlayAlertSound 1 300
+
+Show  # T11-14
+	Class == "Waystones"
+	WaystoneTier >= 11
+	WaystoneTier <= 14
+	SetFontSize 42
+	SetTextColor 255 220 150 255
+	SetBorderColor 255 160 60
+	SetBackgroundColor 40 20 0
+	MinimapIcon 1 Orange Diamond
+	PlayEffect Orange
+	PlayAlertSound 2 300
+
+Show  # T6-10 (light)
+	Class == "Waystones"
+	WaystoneTier >= 6
+	WaystoneTier <= 10
+	SetFontSize 40
+	SetTextColor 255 255 150 255
+	SetBorderColor 200 200 80
+	MinimapIcon 1 Yellow Diamond
+	PlayEffect Yellow Temp
+
+Show  # T1-5 (quiet)
+	Class == "Waystones"
+	WaystoneTier <= 5
+	SetFontSize 34
+	SetTextColor 200 200 150
+	SetBorderColor 100 100 70
+	MinimapIcon 2 Grey Diamond
+
+Show  # Catch-all — any waystone outside the tier ranges
+	Class == "Waystones"
+	SetFontSize 34
+	SetTextColor 200 200 150
+	SetBorderColor 100 100 70
+	MinimapIcon 2 Grey Diamond
+
+
+# ---------------------------------------------------------------------
+# 4) OMENS, EXPEDITION LOGBOOKS & PINNACLE/VAULT KEYS  (all valuable)
+# ---------------------------------------------------------------------
+Show
+	Class == "Omen" "Expedition Logbook" "Pinnacle Keys" "Vault Keys"
+	SetFontSize 44
+	SetTextColor 255 255 255 255
+	SetBorderColor 255 120 255
+	SetBackgroundColor 40 0 40
+	MinimapIcon 0 Pink Star
+	PlayEffect Pink
+	PlayAlertSound 1 300
+
+
+# ---------------------------------------------------------------------
+# 5) ALL UNIQUES  (any slot, any type — sell value; no ilvl floor)
+# ---------------------------------------------------------------------
+Show
+	Rarity Unique
+	SetFontSize 45
+	SetTextColor 175 96 37
+	SetBorderColor 175 96 37
+	SetBackgroundColor 40 20 5
+	MinimapIcon 0 Orange Star
+	PlayEffect Orange
+	PlayAlertSound 4 300
+
+
+# ---------------------------------------------------------------------
+# 6) SKILL + SUPPORT GEMS  (includes uncut gems; no ilvl floor)
+# ---------------------------------------------------------------------
+Show
+	Class == "Skill Gems" "Support Gems"
+	SetFontSize 40
+	SetTextColor 200 130 255
+	SetBorderColor 200 130 255
+	SetBackgroundColor 28 12 40
+	MinimapIcon 1 Purple Triangle
+	PlayEffect Purple
+	PlayAlertSound 3 300
+
+
+# ---------------------------------------------------------------------
+# 7) RARE JEWELLERY & JEWELS  (uniques handled above)
+# ---------------------------------------------------------------------
+Show
+	Class == "Amulets" "Rings" "Belts" "Jewels"
+	Rarity Rare
+	ItemLevel >= 65
+	SetFontSize 40
+	SetTextColor 255 200 120
+	SetBorderColor 255 160 60
+	SetBackgroundColor 35 18 0
+	MinimapIcon 1 Pink Diamond
+	PlayEffect Pink
+	PlayAlertSound 1 300
+
+
+# ---------------------------------------------------------------------
+# 8) FLASKS & CHARMS  (Magic/Rare upgrades only — white ones hidden)
+# ---------------------------------------------------------------------
+Show
+	Class == "Life Flasks" "Mana Flasks" "Charms"
+	Rarity Magic Rare
+	ItemLevel >= 65
+	SetFontSize 34
+	SetTextColor 140 190 255
+	SetBorderColor 90 130 200
+	MinimapIcon 2 Blue Moon
+
+
+# ---------------------------------------------------------------------
+# 9) QUARTERSTAVES  (your only valid weapon — all rarities)
+# ---------------------------------------------------------------------
+Show  # Rare quarterstaves
+	Class == "Quarterstaves"
+	Rarity Rare
+	ItemLevel >= 65
+	SetFontSize 45
+	SetTextColor 0 240 240
+	SetBorderColor 0 240 240
+	SetBackgroundColor 0 45 45
+	MinimapIcon 0 Cyan Diamond
+	PlayEffect Cyan
+	PlayAlertSound 1 300
+
+Show  # Normal / magic quarterstaves (craft fodder)
+	Class == "Quarterstaves"
+	ItemLevel >= 65
+	SetFontSize 32
+	SetTextColor 150 210 210
+	SetBorderColor 70 120 120
+	MinimapIcon 2 Cyan Diamond
+
+
+# ---------------------------------------------------------------------
+# 10) EVASION / ENERGY-SHIELD ARMOUR  (no Armour stat) — all rarities
+#    "BaseArmour 0" drops every Armour-stat base (incl. Armour/Eva and
+#    Armour/ES hybrids) = all "invalid armour" for a dex/int Monk.
+# ---------------------------------------------------------------------
+Show  # RARE — Evasion (and Eva/ES hybrid)
+	Class == "Body Armours" "Helmets" "Gloves" "Boots"
+	Rarity Rare
+	BaseArmour 0
+	BaseEvasion > 0
+	ItemLevel >= 65
+	SetFontSize 38
+	SetTextColor 255 255 119
+	SetBorderColor 255 255 119
+	MinimapIcon 1 Green Square
+	PlayEffect Green
+
+Show  # RARE — Energy Shield (pure)
+	Class == "Body Armours" "Helmets" "Gloves" "Boots"
+	Rarity Rare
+	BaseArmour 0
+	BaseEnergyShield > 0
+	ItemLevel >= 65
+	SetFontSize 38
+	SetTextColor 255 255 119
+	SetBorderColor 255 255 119
+	MinimapIcon 1 Cyan Square
+	PlayEffect Blue
+
+Show  # Craft bases — Evasion (normal / magic)
+	Class == "Body Armours" "Helmets" "Gloves" "Boots"
+	BaseArmour 0
+	BaseEvasion > 0
+	ItemLevel >= 65
+	SetFontSize 30
+	SetTextColor 200 210 170
+	SetBorderColor 90 100 70
+	MinimapIcon 2 Green Square
+
+Show  # Craft bases — Energy Shield (normal / magic)
+	Class == "Body Armours" "Helmets" "Gloves" "Boots"
+	BaseArmour 0
+	BaseEnergyShield > 0
+	ItemLevel >= 65
+	SetFontSize 30
+	SetTextColor 200 210 170
+	SetBorderColor 70 90 100
+	MinimapIcon 2 Cyan Square
+
+
+# ---------------------------------------------------------------------
+# 11) HIDE EVERYTHING ELSE
+# ---------------------------------------------------------------------
+Hide

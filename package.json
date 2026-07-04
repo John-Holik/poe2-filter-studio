@@ -1,0 +1,16 @@
+{
+  "name": "poe2-filter-studio",
+  "version": "1.0.0",
+  "description": "Visual loot-filter editor for Path of Exile 2 — multi-select items and groups, bulk-apply colors/sounds/icons, live label previews, saves straight to your filter folder with backups.",
+  "license": "MIT",
+  "author": "John Holik",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test test/"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
