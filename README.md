@@ -45,6 +45,13 @@ set POE2_FILTER_DIR=D:\wherever\filters && npm start
 
 The server binds to `127.0.0.1` only — nothing is exposed to your network.
 
+## Import to game (PC / PS5 / Xbox)
+
+Pick your platform in the top bar and hit **Import to game**:
+
+- **PC** — the filter is saved into the game's filter folder, and the app shows the reload steps (Options → Game → Item Filter → Reload). Saving is importing on PC.
+- **PS5 / Xbox** — consoles can't read local files, so PoE2 uses *online item filters* tied to your pathofexile.com account. The button copies your filter text to the clipboard, opens [your item filters page](https://www.pathofexile.com/account/item-filters), and walks you through it: add a new filter, set the game to Path of Exile 2, paste, save, and click **Follow** — it then shows up in the in-game filter list on your console. One-time setup: link your PSN/Xbox login to your PoE account under **Manage Account → Secondary Logins**.
+
 ## How selection → rules works
 
 Filter blocks run top-to-bottom and the first match wins. When you add rules for a selection, the app buckets it so the output is correct by construction:

@@ -111,7 +111,8 @@ export function playAlertPreview(id, volume) // WebAudio synth approximation, di
 - `public/img/ATTRIBUTION.md`: images are © Grinding Gear Games, loaded from GGG's CDN at runtime, not distributed with this tool; tool is unaffiliated fan work.
 
 ## UI stability contract (do not rename — tests depend on these)
-ids: topbar `#filter-select #btn-load #btn-new #btn-save #btn-saveas #btn-export #btn-warn #name-prompt #name-input #name-ok #tb-file #dirty-dot #warn-count #warn-drawer`,
+ids: topbar `#filter-select #btn-load #btn-new #btn-save #btn-saveas #btn-export #btn-warn #name-prompt #name-input #name-ok #tb-file #dirty-dot #warn-count #warn-drawer #platform-select #btn-import`,
+import modal `#import-modal #import-title #import-steps #import-fallback #import-text #btn-copy-text #import-close`,
 catalog `#catalog-search #catalog-list #catalog-footer #catalog-count #btn-clear-sel #btn-add-rules`,
 panes `#rules-pane #rules-list #style-pane #style-scope #style-preview #preview-chip`,
 style controls `#seg-action #fs-on #fs-range #fs-num #tc-on #tc-color #tc-alpha #bc-on #bc-color #bc-alpha #bg-on #bg-color #bg-alpha #mi-on #seg-mi-size #mi-color #mi-shape #pe-on #pe-color #pe-temp #as-on #as-id #as-vol #as-play #presets #toasts`.

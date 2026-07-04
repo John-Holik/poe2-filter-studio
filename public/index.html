@@ -32,6 +32,14 @@
     <button id="btn-saveas" title="Save under a new name">Save as&hellip;</button>
     <button id="btn-export" title="Download the serialized .filter">Export</button>
   </span>
+  <span class="tb-group">
+    <select id="platform-select" title="Where you play Path of Exile 2">
+      <option value="PC">PC</option>
+      <option value="PS5">PS5</option>
+      <option value="Xbox">Xbox</option>
+    </select>
+    <button id="btn-import" title="Get this filter into the game on your platform">Import to game</button>
+  </span>
   <button id="btn-warn" class="warn-btn" title="Warnings"><span class="warn-ico">&#9888;</span><span id="warn-count">0</span></button>
 </header>
 
@@ -169,6 +177,19 @@
     </section>
   </aside>
 </main>
+
+<div id="import-modal" hidden>
+  <div class="modal-card">
+    <div class="modal-title" id="import-title">Import to game</div>
+    <ol class="modal-steps" id="import-steps"></ol>
+    <div id="import-fallback" hidden>
+      <div class="note">Clipboard copy failed — copy the filter text manually:</div>
+      <textarea id="import-text" readonly spellcheck="false"></textarea>
+      <button id="btn-copy-text">Copy filter text</button>
+    </div>
+    <div class="modal-foot"><button id="import-close" class="primary">Done</button></div>
+  </div>
+</div>
 
 <div id="toasts"></div>
 

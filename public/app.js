@@ -316,7 +316,10 @@ async function refreshFilterList() {
     const res = await fetch('/api/filters');
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
-    if (data.dir) $('#topbar .brand').title = 'Filter folder: ' + data.dir;
+    if (data.dir) {
+      filterDir = data.dir;
+      $('#topbar .brand').title = 'Filter folder: ' + data.dir;
+    }
     const sel = $('#filter-select');
     const prev = sel.value;
     sel.textContent = '';
@@ -339,7 +342,7 @@ async function loadSelected() {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const text = await res.text();
     const parsed = parseFilter(text);
-    state.doc = { header: parsed.header, rules: parsed.rules };
+    state.doc = { header: parsed.header, rules: parsed.rules, footer: parsed.footer || [] };
     state.parseWarnings = parsed.warnings;
     state.filename = name;
     state.dirty = false;
@@ -365,8 +368,10 @@ async function doSave(name) {
     refresh();
     toast(data.backedUp ? `Saved · backup ${data.backedUp}` : `Saved ${name} (new file)`);
     refreshFilterList();
+    return true;
   } catch (err) {
     toast('Save failed: ' + err.message, 'error');
+    return false;
   }
 }
 
@@ -414,6 +419,56 @@ function exportFilter() {
   a.click();
   URL.revokeObjectURL(a.href);
   toast('Exported ' + a.download);
+}
+
+// ---- import to game (platform-aware) ------------------------------------------------
+// PC reads .filter files straight from the filter folder; consoles use online
+// item filters on your pathofexile.com account (Follow → shows up in-game).
+
+const PLATFORM_KEY = 'poe2-filter-studio.platform';
+const ONLINE_FILTERS_URL = 'https://www.pathofexile.com/account/item-filters';
+let filterDir = null;
+
+async function importToGame() {
+  const platform = $('#platform-select').value;
+  if (platform === 'PC') {
+    if (!state.filename) {
+      toast('Name the filter first', 'error');
+      openNamePrompt();
+      return;
+    }
+    if (state.dirty && !(await doSave(state.filename))) return;
+    showImportModal('Import to game — PC', [
+      `Saved to ${filterDir || 'your PoE2 filter folder'}`,
+      'In game: Options → Game → Item Filter',
+      `Select "${state.filename}" in the list and click Reload`,
+    ], null);
+  } else {
+    const text = serializeFilter(state.doc);
+    let copied = false;
+    try { await navigator.clipboard.writeText(text); copied = true; } catch { /* fallback below */ }
+    window.open(ONLINE_FILTERS_URL, '_blank', 'noopener');
+    showImportModal(`Import to game — ${platform}`, [
+      copied ? 'Your filter text is on the clipboard' : 'Copy the filter text below',
+      'On the pathofexile.com page that just opened, sign in and add a new item filter',
+      'Set the game to Path of Exile 2, paste the filter code, and save',
+      'Click Follow on your new filter',
+      `On your ${platform}: Options → Game → Item Filter → select it`,
+      'One-time setup: your console login must be linked to the same PoE account (pathofexile.com → Manage Account → Secondary Logins)',
+    ], copied ? null : text);
+  }
+}
+
+function showImportModal(title, steps, fallbackText) {
+  $('#import-title').textContent = title;
+  const list = $('#import-steps');
+  list.textContent = '';
+  for (const s of steps) list.append(h('li', {}, s));
+  const fb = $('#import-fallback');
+  fb.hidden = fallbackText == null;
+  if (fallbackText != null) $('#import-text').value = fallbackText;
+  $('#import-modal').hidden = false;
+  $('#import-close').focus();
 }
 
 // ---- top bar / warnings drawer ------------------------------------------------------
@@ -1164,6 +1219,20 @@ function wireTopbar() {
     const d = $('#warn-drawer');
     d.hidden = !d.hidden;
   });
+  $('#btn-import').addEventListener('click', importToGame);
+  $('#platform-select').addEventListener('change', (ev) => {
+    localStorage.setItem(PLATFORM_KEY, ev.target.value);
+  });
+  $('#import-close').addEventListener('click', () => { $('#import-modal').hidden = true; });
+  $('#import-modal').addEventListener('click', (ev) => {
+    if (ev.target === ev.currentTarget) $('#import-modal').hidden = true;
+  });
+  $('#btn-copy-text').addEventListener('click', async () => {
+    const ta = $('#import-text');
+    ta.select();
+    try { await navigator.clipboard.writeText(ta.value); toast('Copied'); }
+    catch { document.execCommand('copy'); toast('Copied'); }
+  });
 }
 
 function wireCatalog() {
@@ -1193,6 +1262,7 @@ function wireKeyboard() {
     } else if (ev.key === 'Escape') {
       closeNamePrompt();
       $('#warn-drawer').hidden = true;
+      $('#import-modal').hidden = true;
       if (state.selection.size) {
         state.selection.clear();
         state.anchorId = null;
@@ -1214,6 +1284,9 @@ function init() {
 
   if (!restore()) newDoc(true);
   else refresh();
+
+  const platform = localStorage.getItem(PLATFORM_KEY);
+  if (platform && $(`#platform-select option[value="${platform}"]`)) $('#platform-select').value = platform;
 
   renderCatalog();
   refreshFilterList();
